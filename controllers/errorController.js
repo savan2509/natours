@@ -6,15 +6,15 @@ const handleCastErrorDB = err => {
 };
 
 const handDuplicateFieldsDB = err => {
+const errors = Object.values(err.errors).map(el => el.message);
   const value = err.errmsg.match(/(["'])(\\?.)*?\1/);
   console.log(value);
 
-  const message = `Duplicate field value: ${value}. Please use another value`
+  const message = `Duplicate field value: ${value}. Please use another value` 
   return new AppError(message, 404);
 };
-const handValidationErrorDB = err => {
-
-  const message = `Invalid input data.`;
+const handValidationErrorDB = err => { 
+  const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 404);
 };
 

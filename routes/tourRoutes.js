@@ -14,7 +14,7 @@ router
 
 router
   .route('/')
-  .get(catchAsync(tourController.getAllTours))
+  .get(tourController.getAllTours)
   .post(tourController.createTour);
 
 router

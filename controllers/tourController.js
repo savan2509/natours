@@ -30,23 +30,21 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const id = req.params.id;
-  if (isValidObjectId(id)) {
-    const tour = await Tour.findById(id)
-      ;
-    if (tour) {
-      return res.status(200).json({ status: "success", data: { tour } });
+  const tour = await Tour.findById(req.params.id).populate('reviews');
+
+    if (!tour) {
+      return next(new AppError('No tour found with that ID', 404));
     }
-  }
-  const tour = await Tour.findById(id).populate('reviews')
-  if (tour) {
+  
     return res.status(200).json({
       status: "success",
-      data: { tour }
+      data: { 
+        tour 
+      }
     });
-  }
-  return next(new AppError('No Tour Found With The Provided Id', 404))
-})
+  });
+
+  // return next(new AppError('No Tour Found With The Provided Id', 404))
 
 // const tour = await Tour.findById(req.params.id);
 // // tour.findOne({ _id: req.params.id})

@@ -10,27 +10,52 @@ const sendEmail = require('./../units/email');
         return jwt.sign({ id }, process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_EXPIRES_IN
         });
+    };
+
+    const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user._id);
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true
+    };
+    if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;    
+
+    res.cookie('jwt', token, cookieOptions);
+
+    // Remove password from 
+    user.password = undefined;
+
+        res.status(statusCode).json({
+            status: 'success',
+            token,
+            data: {
+                    user
+            }
+        });
     }
 
 
 exports.signup = catchAsync(async (req, res, next) => {
-    const newUser = await User.create({
-        name: req.body.name,
-        email: req.body.email,
-        password:req.body.password,
-        passwordConfirm: req.body.passwordConfirm
+    const newUser = await User.create(req.body);
+        createSendToken(newUser, 201, res);
+        // name: req.body.name,
+        // email: req.body.email,
+        // password:req.body.password,
+        // passwordConfirm: req.body.passwordConfirm
     });
  
-    const token = signToken(newUser._id);
+//     const token = signToken(newUser._id);
 
-    res.status(201).json({
-        status: 'success',
-        token,
-        data: {
-                user: newUser
-        }
-    });
-});
+//     res.status(201).json({
+//         status: 'success',
+//         token,
+//         data: {
+//                 user: newUser
+//         }
+//     });
+// });
 
 exports.login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
@@ -47,11 +72,13 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
     //3) if everything ok, send token to client
-    const token = signToken(user._id); 
-    res.status(200).json({
-        status: 'success',
-        token
-    });
+    createSendToken(user, 200, res);
+
+    // const token = signToken(user._id); 
+    // res.status(200).json({
+    //     status: 'success',
+    //     token
+    // });
 });
 
 exports.protect = catchAsync(async(req, res, next) => {
@@ -163,9 +190,30 @@ const hashedToken = crypto
     
     //3) update changedPasswordAt property for the user
     // 4) log the user in, send JWT
-    const token = signToken(user._id); 
-    res.status(200).json({
-        status: 'success',
-        token
-    });
+    createSendToken(user, 200, res);
+
+    // const token = signToken(user._id); 
+    // res.status(200).json({
+    //     status: 'success',
+    //     token
+    // });
+}); 
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+    // 1)  Get user from collection
+    const user = await User.findById(req.body.id).select('+password');
+
+    // 2) cheek if posted current password is correct
+    
+        if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+            return next(new AppError('Your current password is wrong.', 401));
+        }
+    
+
+    // 3) if so, update password
+        user.password = req.body.password;
+        user.passwordConfirm = req.body.passwordConfirm;
+        await user.save();
+    // 4) log user in, send JWT
+    createSendToken(user, 200, res);
 });

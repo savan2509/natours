@@ -13,14 +13,14 @@
  
 // 2) define the email options
     const mailOptions = {
-        from: 'savan Schmedtmann <hello@savan.io>',
+        from: 'savan Schmedtmann <mailto:hello@savan.io>',
         to: options.email,
         subject: options.subject,
-        Text: options.message
-        // html: 
-    } 
+        text: options.message
+     } 
 // 3) Actually send the email
 await transporter.sendMail(mailOptions);
  };
 
  module.exports = sendEmail;
+

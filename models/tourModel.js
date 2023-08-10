@@ -91,7 +91,7 @@ const tourSchema = new mongoose.Schema(
       address:String,
       description: String
     },
-    location: [
+    locations: [
       {
         type: {
           type: String,
@@ -169,7 +169,8 @@ const tourSchema = new mongoose.Schema(
         path: 'guides',
         select:'-__V -passwordChangedAt'
       });
-    })
+      next();
+    });
     tourSchema.post(/^find/, function(docs, next){
       console.log(`Query took ${Date.now() - this.start} milliseconds!`)
       next();

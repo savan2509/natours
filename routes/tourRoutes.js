@@ -5,11 +5,6 @@ const reviewRouter = require('./../routes/reviewRoutes');
 
 const router = express.Router();
 
-
-
- 
-
-
     router.use('/:tourId/reviews', reviewRouter);
 
 router

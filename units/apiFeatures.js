@@ -6,10 +6,10 @@ class APIFeatures {
 
   filter() {
     const queryObj = { ...this.queryString };
-    const excludeFields = ['page', 'sort', 'limit', 'fields'];
-    excludeFields.forEach(el => delete queryObj[el]);
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach(el => delete queryObj[el]);
 
-    // 1B) advanced filtering
+    // 1B) Advanced filtering
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
@@ -20,7 +20,7 @@ class APIFeatures {
 
   sort() {
     if (this.queryString.sort) {
-      const sortBy = req.query.sort.split(' ');
+      const sortBy = this.queryString.sort.split(',').join(' ');
       this.query = this.query.sort(sortBy);
     } else {
       this.query = this.query.sort('-createdAt');
@@ -31,7 +31,7 @@ class APIFeatures {
 
   limitFields() {
     if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').json(' ');
+      const fields = this.queryString.fields.split(',').join(' ');
       this.query = this.query.select(fields);
     } else {
       this.query = this.query.select('-__v');

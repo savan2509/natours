@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express'); 
 const tourController = require('./../controllers/tourController');
 const authController = require('./../controllers/authController');
 const reviewRouter = require('./../routes/reviewRoutes');
@@ -25,7 +25,7 @@ router
     // /tours-within?distance=233&center=-40,45&units=mi
     // /tours-within/233/center/-40,45/units/mi
 
-    router.route('/distances/:latlang/unit/:unit').get(tourController.getDistance);
+    router.route('/distances/:latlang/unit/:unit').get(tourController.getDistances);
 
 router
   .route('/')

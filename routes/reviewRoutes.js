@@ -17,7 +17,7 @@ router
     );
 
 router.route('/:id')
-.get(reviewController.getReviews)
+.get(reviewController.getReview)
 .patch( 
 authController.restrictTo('user', 'admin'),  
 reviewController.updateReview
